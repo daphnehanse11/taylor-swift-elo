@@ -68,7 +68,7 @@ export const albums = [
     },
     {
         id: 'life-of-a-showgirl',
-        name: 'Life of A showgirl',
+        name: 'Life of A Showgirl',
         year: 2024,
         image: 'https://upload.wikimedia.org/wikipedia/en/f/f4/Taylor_Swift_%E2%80%93_The_Life_of_a_Showgirl_%28album_cover%29.png'
     }
