@@ -393,22 +393,19 @@ function setupTabs(isSharedLink) {
     const tabs = {
         'vote-tab': 'vote-section',
         'my-rankings-tab': 'my-rankings-section',
-        'global-rankings-tab': 'global-rankings-section',
-        'about-tab': 'about-section'
+        'global-rankings-tab': 'global-rankings-section'
     };
 
     const hashToTab = {
         '#vote': 'vote-tab',
         '#my-rankings': 'my-rankings-tab',
-        '#global-rankings': 'global-rankings-tab',
-        '#about': 'about-tab'
+        '#global-rankings': 'global-rankings-tab'
     };
 
     const tabToHash = {
         'vote-tab': '#vote',
         'my-rankings-tab': '#my-rankings',
-        'global-rankings-tab': '#global-rankings',
-        'about-tab': '#about'
+        'global-rankings-tab': '#global-rankings'
     };
 
     // Determine initial tab

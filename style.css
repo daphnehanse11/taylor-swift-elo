@@ -595,7 +595,11 @@ nav {
 }
 
 .global-rank.hidden {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
 }
 
 .global-rank.higher {
@@ -614,11 +618,14 @@ nav {
 /* Next Matchup Button */
 #next-matchup-btn-container {
     text-align: center;
-    margin-top: 30px;
+    margin-bottom: 20px;
+    min-height: 60px;
 }
 
 #next-matchup-btn-container.hidden {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .next-btn {
