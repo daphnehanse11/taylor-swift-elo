@@ -736,34 +736,35 @@ nav {
 
     /* Rankings layout on mobile */
     .rankings-columns {
-        gap: 6px;
+        gap: 4px;
+        grid-template-columns: 1fr 1fr !important;
     }
 
     .rankings-column {
-        gap: 6px;
+        gap: 4px;
     }
 
     .ranking-item-compact {
-        padding: 6px;
+        padding: 4px;
     }
 
     .rank-compact {
-        font-size: 0.9em;
-        width: 28px;
+        font-size: 0.75em;
+        width: 22px;
     }
 
     .ranking-item-compact img {
-        width: 35px;
-        height: 35px;
-        margin: 0 4px;
+        width: 28px;
+        height: 28px;
+        margin: 0 3px;
     }
 
     .album-info-compact h3 {
-        font-size: 0.75em;
-        line-height: 1.2;
+        font-size: 0.65em;
+        line-height: 1.1;
     }
 
     .album-info-compact .elo-score {
-        font-size: 0.65em;
+        font-size: 0.55em;
     }
 }
