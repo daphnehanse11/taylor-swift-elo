@@ -29,6 +29,7 @@
                 <button id="vote-tab" class="tab-btn">Vote</button>
                 <button id="my-rankings-tab" class="tab-btn">My Rankings</button>
                 <button id="global-rankings-tab" class="tab-btn">Global Rankings</button>
+                <button id="about-tab" class="tab-btn">About</button>
             </nav>
         </header>
 
@@ -76,9 +77,58 @@
         <section id="global-rankings-section" class="section">
             <h2>Global Consensus Rankings</h2>
             <div class="stats">
-                <p>Total votes across all users: <span id="total-votes">0</span></p>
+                <p>Total votes: <span id="total-votes">0</span></p>
+                <p>Total users: <span id="total-users">0</span></p>
             </div>
             <div id="global-rankings" class="rankings-list"></div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about-section" class="section">
+            <h2>How It Works</h2>
+            <div class="about-content">
+                <div class="about-card">
+                    <h3>🎯 What is ELO?</h3>
+                    <p>ELO is a rating system originally created for chess. When two items compete, the winner gains points and the loser loses points. The amount depends on their relative rankings:</p>
+                    <ul>
+                        <li>If a lower-ranked album beats a higher-ranked one, it gains more points (upset!)</li>
+                        <li>If the favorite wins, fewer points change hands</li>
+                        <li>All albums start at 1500 ELO</li>
+                    </ul>
+                </div>
+
+                <div class="about-card">
+                    <h3>💜 How to Use This Site</h3>
+                    <ol>
+                        <li><strong>Vote:</strong> Choose between two albums. Your choice updates your personal rankings.</li>
+                        <li><strong>My Rankings:</strong> See your personal album rankings based on your votes. Share the link with friends!</li>
+                        <li><strong>Global Rankings:</strong> See the consensus from all users combined.</li>
+                        <li><strong>Reset:</strong> Start over anytime - your previous votes stay in global rankings.</li>
+                    </ol>
+                </div>
+
+                <div class="about-card">
+                    <h3>✨ Features</h3>
+                    <ul>
+                        <li><strong>No login required</strong> - We generate an anonymous ID for you</li>
+                        <li><strong>Shareable rankings</strong> - Copy your link and share your hot takes</li>
+                        <li><strong>Real-time updates</strong> - Global rankings update as people vote</li>
+                        <li><strong>Mobile-friendly</strong> - Perfect for voting on the go</li>
+                    </ul>
+                </div>
+
+                <div class="about-card">
+                    <h3>🔢 The Math</h3>
+                    <p>Each matchup uses this formula:</p>
+                    <p class="formula"><strong>New Rating = Old Rating + 32 × (Actual - Expected)</strong></p>
+                    <p>Where "Expected" is calculated based on the rating difference between the two albums. The bigger the rating gap, the more certain we are about who "should" win!</p>
+                </div>
+
+                <div class="about-footer">
+                    <p>Made with 💜 for Swifties</p>
+                    <p class="small-text">Data stored locally and in Firebase. Your votes are anonymous.</p>
+                </div>
+            </div>
         </section>
     </div>
 

@@ -98,7 +98,7 @@ export async function getUserStats(userId) {
 /**
  * Update global ELO ratings
  */
-export async function updateGlobalELO(winnerId, loserId, newWinnerRating, newLoserRating) {
+export async function updateGlobalELO(winnerId, loserId, newWinnerRating, newLoserRating, userId) {
     if (!initialized) return;
 
     try {
@@ -109,12 +109,17 @@ export async function updateGlobalELO(winnerId, loserId, newWinnerRating, newLos
         const globalDoc = await getDoc(globalDocRef);
 
         const currentRatings = globalDoc.exists() ? globalDoc.data() : {};
+        const uniqueUsers = currentRatings.uniqueUsers || {};
+
+        // Add user to unique users set
+        uniqueUsers[userId] = true;
 
         await setDoc(globalDocRef, {
             ...currentRatings,
             [winnerId]: newWinnerRating,
             [loserId]: newLoserRating,
             totalVotes: increment(1),
+            uniqueUsers: uniqueUsers,
             lastUpdated: Date.now()
         }, { merge: true });
     } catch (error) {

@@ -19,6 +19,7 @@ let myOwnRatings = {}; // Current viewer's ratings (for voting)
 let globalRatings = {};
 let voteCount = 0;
 let totalGlobalVotes = 0;
+let totalUniqueUsers = 0;
 let usedPairs = new Set();
 
 /**
@@ -107,9 +108,10 @@ async function loadGlobalRankings() {
     if (isInitialized()) {
         const data = await getGlobalELO();
         if (data) {
-            const { totalVotes, lastUpdated, ...ratings } = data;
+            const { totalVotes, uniqueUsers, lastUpdated, ...ratings } = data;
             globalRatings = ratings;
             totalGlobalVotes = totalVotes || 0;
+            totalUniqueUsers = uniqueUsers ? Object.keys(uniqueUsers).length : 0;
 
             // Initialize missing albums
             albums.forEach(album => {
@@ -118,7 +120,7 @@ async function loadGlobalRankings() {
                 }
             });
 
-            updateTotalVotesDisplay();
+            updateGlobalStatsDisplay();
         }
     } else {
         // Load from localStorage
@@ -130,7 +132,13 @@ async function loadGlobalRankings() {
         if (savedVotes) {
             totalGlobalVotes = parseInt(savedVotes);
         }
-        updateTotalVotesDisplay();
+        const savedUsers = localStorage.getItem('tselo-total-users');
+        if (savedUsers) {
+            totalUniqueUsers = parseInt(savedUsers);
+        } else {
+            totalUniqueUsers = 1; // At least the current user
+        }
+        updateGlobalStatsDisplay();
     }
 
     // Initialize all albums with default rating if needed
@@ -142,10 +150,11 @@ async function loadGlobalRankings() {
 }
 
 /**
- * Update total votes display
+ * Update global stats display
  */
-function updateTotalVotesDisplay() {
+function updateGlobalStatsDisplay() {
     document.getElementById('total-votes').textContent = totalGlobalVotes;
+    document.getElementById('total-users').textContent = totalUniqueUsers;
 }
 
 /**
@@ -223,21 +232,22 @@ async function handleVote(choice) {
     totalGlobalVotes++;
     document.getElementById('vote-count').textContent = voteCount;
     localStorage.setItem('tselo-voteCount-' + userId, voteCount);
-    updateTotalVotesDisplay();
+    updateGlobalStatsDisplay();
 
     // Save to Firebase or localStorage
     if (isInitialized()) {
         await saveVote(userId, winner.id, loser.id);
         await updateUserStats(userId, myOwnRatings);
-        await updateGlobalELO(winner.id, loser.id, globalRatings[winner.id], globalRatings[loser.id]);
+        await updateGlobalELO(winner.id, loser.id, globalRatings[winner.id], globalRatings[loser.id], userId);
 
-        // Reload global data to get updated vote count
+        // Reload global data to get updated vote count and user count
         await loadGlobalRankings();
     } else {
         // Save to localStorage
         localStorage.setItem('tselo-ratings-' + userId, JSON.stringify(myOwnRatings));
         localStorage.setItem('tselo-global-ratings', JSON.stringify(globalRatings));
         localStorage.setItem('tselo-total-votes', totalGlobalVotes.toString());
+        localStorage.setItem('tselo-total-users', '1'); // In offline mode, only current user
     }
 
     // Show vote result inline
@@ -383,19 +393,22 @@ function setupTabs(isSharedLink) {
     const tabs = {
         'vote-tab': 'vote-section',
         'my-rankings-tab': 'my-rankings-section',
-        'global-rankings-tab': 'global-rankings-section'
+        'global-rankings-tab': 'global-rankings-section',
+        'about-tab': 'about-section'
     };
 
     const hashToTab = {
         '#vote': 'vote-tab',
         '#my-rankings': 'my-rankings-tab',
-        '#global-rankings': 'global-rankings-tab'
+        '#global-rankings': 'global-rankings-tab',
+        '#about': 'about-tab'
     };
 
     const tabToHash = {
         'vote-tab': '#vote',
         'my-rankings-tab': '#my-rankings',
-        'global-rankings-tab': '#global-rankings'
+        'global-rankings-tab': '#global-rankings',
+        'about-tab': '#about'
     };
 
     // Determine initial tab

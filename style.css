@@ -431,10 +431,86 @@ nav {
 }
 
 .stats {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
     margin-bottom: 30px;
     font-size: 1.2em;
     color: #666;
+    flex-wrap: wrap;
+}
+
+.stats p {
+    margin: 0;
+}
+
+/* About Section Styles */
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.about-card h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+.about-card p {
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 10px;
+}
+
+.about-card ul, .about-card ol {
+    color: #555;
+    line-height: 1.8;
+    margin-left: 20px;
+}
+
+.about-card li {
+    margin-bottom: 8px;
+}
+
+.about-card strong {
+    color: #667eea;
+}
+
+.formula {
+    background: #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    margin: 15px 0;
+    border-left: 4px solid #667eea;
+}
+
+.about-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.about-footer p {
+    color: #667eea;
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.small-text {
+    font-size: 0.9em !important;
+    color: #999 !important;
 }
 
 .share-link {
