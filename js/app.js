@@ -11,9 +11,11 @@ import {
 } from './firebase-service.js';
 
 // State
-let userId = null;
+let userId = null; // Current viewer's ID (for voting)
+let viewingUserId = null; // User whose rankings we're viewing
 let currentMatchup = null;
-let personalRatings = {};
+let personalRatings = {}; // The ratings being displayed (might be viewer's or someone else's)
+let myOwnRatings = {}; // Current viewer's ratings (for voting)
 let globalRatings = {};
 let voteCount = 0;
 let totalGlobalVotes = 0;
@@ -27,20 +29,18 @@ function initUserId() {
     const urlUserId = params.get('user');
     const isSharedLink = !!urlUserId;
 
-    if (urlUserId) {
-        userId = urlUserId;
-        // Don't save shared user ID to localStorage
-    } else {
-        // Check localStorage
-        userId = localStorage.getItem('tselo-userId');
-        if (!userId) {
-            // Generate new ID
-            userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
-            localStorage.setItem('tselo-userId', userId);
-        }
+    // Always get or create the current viewer's ID
+    userId = localStorage.getItem('tselo-userId');
+    if (!userId) {
+        userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
+        localStorage.setItem('tselo-userId', userId);
     }
 
-    // Update share URL
+    // If viewing a shared link, set viewingUserId to the shared user
+    // Otherwise, we're viewing our own rankings
+    viewingUserId = urlUserId || userId;
+
+    // Update share URL with current viewer's ID
     const shareUrl = `${window.location.origin}${window.location.pathname}?user=${userId}#my-rankings`;
     document.getElementById('share-url').value = shareUrl;
 
@@ -51,24 +51,18 @@ function initUserId() {
  * Load user data from Firebase or localStorage
  */
 async function loadUserData() {
+    // Load the viewing user's data (for display on "My Rankings")
     if (isInitialized()) {
-        const stats = await getUserStats(userId);
+        const stats = await getUserStats(viewingUserId);
         if (stats && stats.personalRatings) {
             personalRatings = stats.personalRatings;
         }
     } else {
         // Load from localStorage
-        const saved = localStorage.getItem('tselo-ratings-' + userId);
+        const saved = localStorage.getItem('tselo-ratings-' + viewingUserId);
         if (saved) {
             personalRatings = JSON.parse(saved);
         }
-    }
-
-    // Load vote count from localStorage
-    const savedVoteCount = localStorage.getItem('tselo-voteCount-' + userId);
-    if (savedVoteCount) {
-        voteCount = parseInt(savedVoteCount);
-        document.getElementById('vote-count').textContent = voteCount;
     }
 
     // Initialize all albums with default rating if needed
@@ -77,6 +71,33 @@ async function loadUserData() {
             personalRatings[album.id] = INITIAL_ELO;
         }
     });
+
+    // Load current viewer's own ratings (for voting)
+    if (isInitialized()) {
+        const myStats = await getUserStats(userId);
+        if (myStats && myStats.personalRatings) {
+            myOwnRatings = myStats.personalRatings;
+        }
+    } else {
+        const mySaved = localStorage.getItem('tselo-ratings-' + userId);
+        if (mySaved) {
+            myOwnRatings = JSON.parse(mySaved);
+        }
+    }
+
+    // Initialize current viewer's albums
+    albums.forEach(album => {
+        if (!myOwnRatings[album.id]) {
+            myOwnRatings[album.id] = INITIAL_ELO;
+        }
+    });
+
+    // Load current viewer's vote count
+    const savedVoteCount = localStorage.getItem('tselo-voteCount-' + userId);
+    if (savedVoteCount) {
+        voteCount = parseInt(savedVoteCount);
+        document.getElementById('vote-count').textContent = voteCount;
+    }
 }
 
 /**
@@ -186,8 +207,13 @@ async function handleVote(choice) {
     const winner = choice === 'a' ? albumA : albumB;
     const loser = choice === 'a' ? albumB : albumA;
 
-    // Update personal ratings
-    personalRatings = updateRatings(personalRatings, winner.id, loser.id);
+    // Update viewer's own ratings
+    myOwnRatings = updateRatings(myOwnRatings, winner.id, loser.id);
+
+    // If viewing our own rankings, update displayed ratings
+    if (viewingUserId === userId) {
+        personalRatings = myOwnRatings;
+    }
 
     // Update global ratings
     globalRatings = updateRatings(globalRatings, winner.id, loser.id);
@@ -202,14 +228,14 @@ async function handleVote(choice) {
     // Save to Firebase or localStorage
     if (isInitialized()) {
         await saveVote(userId, winner.id, loser.id);
-        await updateUserStats(userId, personalRatings);
+        await updateUserStats(userId, myOwnRatings);
         await updateGlobalELO(winner.id, loser.id, globalRatings[winner.id], globalRatings[loser.id]);
 
         // Reload global data to get updated vote count
         await loadGlobalRankings();
     } else {
         // Save to localStorage
-        localStorage.setItem('tselo-ratings-' + userId, JSON.stringify(personalRatings));
+        localStorage.setItem('tselo-ratings-' + userId, JSON.stringify(myOwnRatings));
         localStorage.setItem('tselo-global-ratings', JSON.stringify(globalRatings));
         localStorage.setItem('tselo-total-votes', totalGlobalVotes.toString());
     }
@@ -262,21 +288,50 @@ function displayPersonalRankings() {
     const rankings = getRankings(personalRatings, albums);
     const container = document.getElementById('personal-rankings');
 
-    if (voteCount === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">Start voting to build your personal rankings!</p>';
+    // Check if any rankings exist (all albums at 1500 = no votes)
+    const hasRankings = rankings.some(r => r.rating !== INITIAL_ELO);
+
+    if (!hasRankings) {
+        const message = viewingUserId === userId
+            ? 'Start voting to build your personal rankings!'
+            : 'This user hasn\'t voted yet!';
+        container.innerHTML = `<p style="text-align: center; color: #666; padding: 40px;">${message}</p>`;
         return;
     }
 
-    container.innerHTML = rankings.map((album, index) => `
-        <div class="ranking-item">
-            <div class="rank">#${index + 1}</div>
-            <img src="${album.image}" alt="${album.name}">
-            <div class="album-info">
-                <h3>${album.name}</h3>
-                <p class="elo-score">ELO: ${album.rating}</p>
+    // Split rankings into two columns
+    const midpoint = Math.ceil(rankings.length / 2);
+    const leftColumn = rankings.slice(0, midpoint);
+    const rightColumn = rankings.slice(midpoint);
+
+    container.innerHTML = `
+        <div class="rankings-columns">
+            <div class="rankings-column">
+                ${leftColumn.map((album, index) => `
+                    <div class="ranking-item-compact">
+                        <div class="rank-compact">#${index + 1}</div>
+                        <img src="${album.image}" alt="${album.name}">
+                        <div class="album-info-compact">
+                            <h3>${album.name}</h3>
+                            <p class="elo-score">ELO: ${album.rating}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="rankings-column">
+                ${rightColumn.map((album, index) => `
+                    <div class="ranking-item-compact">
+                        <div class="rank-compact">#${midpoint + index + 1}</div>
+                        <img src="${album.image}" alt="${album.name}">
+                        <div class="album-info-compact">
+                            <h3>${album.name}</h3>
+                            <p class="elo-score">ELO: ${album.rating}</p>
+                        </div>
+                    </div>
+                `).join('')}
             </div>
         </div>
-    `).join('');
+    `;
 }
 
 /**
@@ -367,6 +422,9 @@ function switchToTab(tabId, tabs) {
 
     // Refresh rankings if viewing them
     if (tabId === 'my-rankings-tab') {
+        // Update title based on whose rankings we're viewing
+        const title = viewingUserId === userId ? 'Your Personal Rankings' : 'Their Personal Rankings';
+        document.getElementById('rankings-title').textContent = title;
         displayPersonalRankings();
     } else if (tabId === 'global-rankings-tab') {
         displayGlobalRankings();
