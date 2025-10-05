@@ -219,25 +219,8 @@ function showVoteResult(winner, loser) {
     const winnerRank = rankings.findIndex(a => a.id === winner.id) + 1;
     const loserRank = rankings.findIndex(a => a.id === loser.id) + 1;
 
-    // Determine if user agrees with majority
-    const agreesWithMajority = winnerRank < loserRank;
-
-    const messages = agreesWithMajority ? [
-        "You're with the crowd! 👥",
-        "Most people agree! ✨",
-        "Popular opinion! 🌟",
-        "You picked the favorite! 💜"
-    ] : [
-        "Hot take! 🔥",
-        "Going against the grain! 💫",
-        "Minority opinion! ✊",
-        "Bold choice! 🎯"
-    ];
-
-    const message = messages[Math.floor(Math.random() * messages.length)];
-
     // Update modal content
-    document.getElementById('result-message').textContent = message;
+    document.getElementById('result-message').textContent = 'Global Rankings';
     document.getElementById('result-winner-img').src = winner.image;
     document.getElementById('result-winner-img').alt = winner.name;
     document.getElementById('result-winner-name').textContent = winner.name;

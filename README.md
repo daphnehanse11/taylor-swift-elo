@@ -1,6 +1,6 @@
 # Taylor Swift Album ELO Rankings
 
-A web app that uses the ELO rating system to rank Taylor Swift albums based on head-to-head matchups. Vote on album pairs and see both your personal rankings and the global consensus!
+A web app that uses the ELO rating system to rank Taylor Swift albums based on head-to-head matchups. Vote on album pairs, see how you compare to the crowd, and explore both personal rankings and the global consensus!
 
 ## For Users
 
