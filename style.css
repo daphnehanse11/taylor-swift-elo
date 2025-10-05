@@ -339,21 +339,30 @@ nav {
 
 @media (max-width: 768px) {
     .albums {
-        flex-direction: column;
-        gap: 20px;
+        gap: 15px;
     }
 
     .vs {
-        font-size: 2em;
+        font-size: 1.5em;
     }
 
     .album-card {
+        width: 45%;
+        max-width: none;
+        padding: 15px;
+    }
+
+    .album-card img {
         width: 100%;
-        max-width: 300px;
+        margin-bottom: 15px;
+    }
+
+    .album-card h3 {
+        font-size: 1em;
     }
 
     h1 {
-        font-size: 1.8em;
+        font-size: 1.5em;
     }
 
     #share-url {
@@ -366,7 +375,13 @@ nav {
         gap: 15px;
     }
 
-    .rankings-columns {
-        grid-template-columns: 1fr;
+    .global-rank {
+        font-size: 0.85em;
+        padding: 6px;
+    }
+
+    .vote-btn {
+        padding: 12px 20px;
+        font-size: 1em;
     }
 }
