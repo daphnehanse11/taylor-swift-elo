@@ -341,16 +341,39 @@ function displayGlobalRankings() {
     const rankings = getRankings(globalRatings, albums);
     const container = document.getElementById('global-rankings');
 
-    container.innerHTML = rankings.map((album, index) => `
-        <div class="ranking-item">
-            <div class="rank">#${index + 1}</div>
-            <img src="${album.image}" alt="${album.name}">
-            <div class="album-info">
-                <h3>${album.name}</h3>
-                <p class="elo-score">ELO: ${album.rating}</p>
+    // Split rankings into two columns
+    const midpoint = Math.ceil(rankings.length / 2);
+    const leftColumn = rankings.slice(0, midpoint);
+    const rightColumn = rankings.slice(midpoint);
+
+    container.innerHTML = `
+        <div class="rankings-columns">
+            <div class="rankings-column">
+                ${leftColumn.map((album, index) => `
+                    <div class="ranking-item-compact">
+                        <div class="rank-compact">#${index + 1}</div>
+                        <img src="${album.image}" alt="${album.name}">
+                        <div class="album-info-compact">
+                            <h3>${album.name}</h3>
+                            <p class="elo-score">ELO: ${album.rating}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="rankings-column">
+                ${rightColumn.map((album, index) => `
+                    <div class="ranking-item-compact">
+                        <div class="rank-compact">#${midpoint + index + 1}</div>
+                        <img src="${album.image}" alt="${album.name}">
+                        <div class="album-info-compact">
+                            <h3>${album.name}</h3>
+                            <p class="elo-score">ELO: ${album.rating}</p>
+                        </div>
+                    </div>
+                `).join('')}
             </div>
         </div>
-    `).join('');
+    `;
 }
 
 /**

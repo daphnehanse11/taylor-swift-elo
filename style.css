@@ -339,20 +339,19 @@ nav {
 
 @media (max-width: 768px) {
     .albums {
-        flex-direction: row;
-        gap: 10px;
-        flex-wrap: nowrap;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
     }
 
     .vs {
-        font-size: 1.2em;
-        writing-mode: vertical-rl;
+        font-size: 1.5em;
     }
 
     .album-card {
-        width: 42%;
-        max-width: none;
-        padding: 10px;
+        width: 80%;
+        max-width: 280px;
+        padding: 15px;
     }
 
     .album-card img {
@@ -361,7 +360,7 @@ nav {
     }
 
     .album-card h3 {
-        font-size: 0.9em;
+        font-size: 1em;
         margin-bottom: 10px;
     }
 
@@ -385,45 +384,50 @@ nav {
     }
 
     .global-rank {
-        font-size: 0.75em;
-        padding: 5px;
+        font-size: 0.85em;
+        padding: 6px;
         margin: 8px 0;
     }
 
     .vote-btn {
-        padding: 10px 15px;
-        font-size: 0.9em;
+        padding: 12px 20px;
+        font-size: 1em;
     }
 
     /* Rankings layout on mobile */
+    .section {
+        padding: 20px 10px;
+    }
+
     .rankings-columns {
-        gap: 8px;
+        gap: 6px;
     }
 
     .rankings-column {
-        gap: 8px;
+        gap: 6px;
     }
 
     .ranking-item-compact {
-        padding: 8px;
+        padding: 6px;
     }
 
     .rank-compact {
-        font-size: 1em;
-        width: 30px;
+        font-size: 0.9em;
+        width: 28px;
     }
 
     .ranking-item-compact img {
-        width: 40px;
-        height: 40px;
-        margin: 0 6px;
+        width: 35px;
+        height: 35px;
+        margin: 0 4px;
     }
 
     .album-info-compact h3 {
-        font-size: 0.8em;
+        font-size: 0.75em;
+        line-height: 1.2;
     }
 
     .album-info-compact .elo-score {
-        font-size: 0.7em;
+        font-size: 0.65em;
     }
 }
