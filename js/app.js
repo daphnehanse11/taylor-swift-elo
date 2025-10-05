@@ -200,6 +200,9 @@ async function handleVote(choice) {
         await saveVote(userId, winner.id, loser.id);
         await updateUserStats(userId, personalRatings);
         await updateGlobalELO(winner.id, loser.id, globalRatings[winner.id], globalRatings[loser.id]);
+
+        // Reload global data to get updated vote count
+        await loadGlobalRankings();
     } else {
         // Save to localStorage
         localStorage.setItem('tselo-ratings-' + userId, JSON.stringify(personalRatings));

@@ -116,7 +116,7 @@ export async function updateGlobalELO(winnerId, loserId, newWinnerRating, newLos
             [loserId]: newLoserRating,
             totalVotes: increment(1),
             lastUpdated: Date.now()
-        });
+        }, { merge: true });
     } catch (error) {
         console.error('Error updating global ELO:', error);
     }
