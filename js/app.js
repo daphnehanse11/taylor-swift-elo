@@ -25,9 +25,11 @@ let usedPairs = new Set();
 function initUserId() {
     const params = new URLSearchParams(window.location.search);
     const urlUserId = params.get('user');
+    const isSharedLink = !!urlUserId;
 
     if (urlUserId) {
         userId = urlUserId;
+        // Don't save shared user ID to localStorage
     } else {
         // Check localStorage
         userId = localStorage.getItem('tselo-userId');
@@ -39,8 +41,10 @@ function initUserId() {
     }
 
     // Update share URL
-    const shareUrl = `${window.location.origin}${window.location.pathname}?user=${userId}`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}?user=${userId}#my-rankings`;
     document.getElementById('share-url').value = shareUrl;
+
+    return isSharedLink;
 }
 
 /**
@@ -213,11 +217,9 @@ async function handleVote(choice) {
     // Show vote result inline
     showVoteResult(albumA, albumB);
 
-    // Auto-hide result and show next matchup after 3 seconds
-    setTimeout(() => {
-        document.getElementById('vote-result').classList.add('hidden');
-        generateMatchup();
-    }, 3000);
+    // Disable vote buttons and show next button
+    document.querySelectorAll('.vote-btn').forEach(btn => btn.disabled = true);
+    document.getElementById('next-matchup-btn-container').classList.remove('hidden');
 }
 
 /**
@@ -228,12 +230,29 @@ function showVoteResult(albumA, albumB) {
     const albumARank = rankings.findIndex(a => a.id === albumA.id) + 1;
     const albumBRank = rankings.findIndex(a => a.id === albumB.id) + 1;
 
-    // Update result content
-    document.getElementById('result-a-rank').textContent = `${albumA.name}: #${albumARank}`;
-    document.getElementById('result-b-rank').textContent = `${albumB.name}: #${albumBRank}`;
+    const rankA = document.getElementById('rank-a');
+    const rankB = document.getElementById('rank-b');
 
-    // Show result
-    document.getElementById('vote-result').classList.remove('hidden');
+    // Update content
+    rankA.textContent = `Global Rank: #${albumARank}`;
+    rankB.textContent = `Global Rank: #${albumBRank}`;
+
+    // Show ranks
+    rankA.classList.remove('hidden');
+    rankB.classList.remove('hidden');
+
+    // Apply color coding (higher rank = lower number = better)
+    if (albumARank < albumBRank) {
+        rankA.classList.add('higher');
+        rankA.classList.remove('lower');
+        rankB.classList.add('lower');
+        rankB.classList.remove('higher');
+    } else {
+        rankB.classList.add('higher');
+        rankB.classList.remove('lower');
+        rankA.classList.add('lower');
+        rankA.classList.remove('higher');
+    }
 }
 
 /**
@@ -282,19 +301,52 @@ function displayGlobalRankings() {
 /**
  * Setup tab switching
  */
-function setupTabs() {
+function setupTabs(isSharedLink) {
     const tabs = {
         'vote-tab': 'vote-section',
         'my-rankings-tab': 'my-rankings-section',
         'global-rankings-tab': 'global-rankings-section'
     };
 
-    // Restore last active tab
-    const lastActiveTab = localStorage.getItem('tselo-active-tab') || 'vote-tab';
-    switchToTab(lastActiveTab, tabs);
+    const hashToTab = {
+        '#vote': 'vote-tab',
+        '#my-rankings': 'my-rankings-tab',
+        '#global-rankings': 'global-rankings-tab'
+    };
 
+    const tabToHash = {
+        'vote-tab': '#vote',
+        'my-rankings-tab': '#my-rankings',
+        'global-rankings-tab': '#global-rankings'
+    };
+
+    // Determine initial tab
+    let initialTab;
+    const hash = window.location.hash;
+
+    if (hash && hashToTab[hash]) {
+        initialTab = hashToTab[hash];
+    } else if (isSharedLink) {
+        initialTab = 'my-rankings-tab';
+        window.location.hash = '#my-rankings';
+    } else {
+        initialTab = localStorage.getItem('tselo-active-tab') || 'vote-tab';
+    }
+
+    switchToTab(initialTab, tabs);
+
+    // Handle hash changes
+    window.addEventListener('hashchange', () => {
+        const newHash = window.location.hash;
+        if (hashToTab[newHash]) {
+            switchToTab(hashToTab[newHash], tabs);
+        }
+    });
+
+    // Handle tab clicks
     Object.keys(tabs).forEach(tabId => {
         document.getElementById(tabId).addEventListener('click', () => {
+            window.location.hash = tabToHash[tabId];
             switchToTab(tabId, tabs);
             localStorage.setItem('tselo-active-tab', tabId);
         });
@@ -331,6 +383,20 @@ function setupVoteButtons() {
             handleVote(choice);
         });
     });
+
+    // Setup next matchup button
+    document.getElementById('next-matchup-btn').addEventListener('click', () => {
+        // Hide ranks and next button
+        document.getElementById('rank-a').classList.add('hidden');
+        document.getElementById('rank-b').classList.add('hidden');
+        document.getElementById('next-matchup-btn-container').classList.add('hidden');
+
+        // Re-enable vote buttons
+        document.querySelectorAll('.vote-btn').forEach(btn => btn.disabled = false);
+
+        // Generate next matchup
+        generateMatchup();
+    });
 }
 
 /**
@@ -359,14 +425,14 @@ async function init() {
     await initFirebase();
 
     // Initialize user
-    initUserId();
+    const isSharedLink = initUserId();
 
     // Load data
     await loadUserData();
     await loadGlobalRankings();
 
     // Setup UI
-    setupTabs();
+    setupTabs(isSharedLink);
     setupVoteButtons();
     setupCopyLink();
 

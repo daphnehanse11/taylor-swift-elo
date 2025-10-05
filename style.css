@@ -227,37 +227,55 @@ nav {
     background: #764ba2;
 }
 
-/* Vote Result Styles */
-.vote-result {
-    margin-top: 30px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    text-align: center;
+/* Global Rank Display */
+.global-rank {
+    font-size: 1em;
+    font-weight: 600;
+    margin: 10px 0;
+    padding: 8px;
+    border-radius: 5px;
     transition: all 0.3s;
 }
 
-.vote-result.hidden {
+.global-rank.hidden {
     display: none;
 }
 
-.result-title {
-    color: #667eea;
-    font-weight: 600;
-    font-size: 1.1em;
-    margin-bottom: 15px;
+.global-rank.higher {
+    background: #e0d4f7;
+    color: #764ba2;
 }
 
-.result-info {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
+.global-rank.lower {
+    background: #764ba2;
+    color: white;
 }
 
-.result-info span {
-    color: #333;
-    font-size: 1em;
+/* Next Matchup Button */
+#next-matchup-btn-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#next-matchup-btn-container.hidden {
+    display: none;
+}
+
+.next-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.next-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 @media (max-width: 768px) {
