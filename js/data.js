@@ -64,13 +64,13 @@ export const albums = [
         id: 'ttpd',
         name: 'The Tortured Poets Department',
         year: 2024,
-        image: 'https://upload.wikimedia.org/wikipedia/en/3/35/Taylor_Swift_%E2%80%93_The_Tortured_Poets_Department.png'
+        image: 'https://upload.wikimedia.org/wikipedia/en/9/9c/Taylor_Swift_-_The_Tortured_Poets_Department_%28album_cover%29.png'
     },
     {
         id: 'life-of-a-showgirl',
         name: 'Life of A showgirl',
         year: 2024,
-        image: 'https://upload.wikimedia.org/wikipedia/en/d/df/Taylor_Swift_-_Life_of_a_Showgirl.png'
+        image: 'https://i.scdn.co/image/ab67616d0000b273e5b19c8b86e08fa582f23c16'
     }
 ];
 

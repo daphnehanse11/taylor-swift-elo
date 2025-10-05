@@ -207,40 +207,30 @@ async function handleVote(choice) {
         localStorage.setItem('tselo-total-votes', totalGlobalVotes.toString());
     }
 
-    // Show vote result modal
-    showVoteResult(winner, loser);
+    // Show vote result inline
+    showVoteResult(albumA, albumB);
+
+    // Auto-hide result and show next matchup after 3 seconds
+    setTimeout(() => {
+        document.getElementById('vote-result').classList.add('hidden');
+        generateMatchup();
+    }, 3000);
 }
 
 /**
- * Show vote result modal with global rankings
+ * Show vote result with global rankings
  */
-function showVoteResult(winner, loser) {
+function showVoteResult(albumA, albumB) {
     const rankings = getRankings(globalRatings, albums);
-    const winnerRank = rankings.findIndex(a => a.id === winner.id) + 1;
-    const loserRank = rankings.findIndex(a => a.id === loser.id) + 1;
+    const albumARank = rankings.findIndex(a => a.id === albumA.id) + 1;
+    const albumBRank = rankings.findIndex(a => a.id === albumB.id) + 1;
 
-    // Update modal content
-    document.getElementById('result-message').textContent = 'Global Rankings';
-    document.getElementById('result-winner-img').src = winner.image;
-    document.getElementById('result-winner-img').alt = winner.name;
-    document.getElementById('result-winner-name').textContent = winner.name;
-    document.getElementById('result-winner-rank').textContent = `Global Rank: #${winnerRank}`;
+    // Update result content
+    document.getElementById('result-a-rank').textContent = `${albumA.name}: #${albumARank}`;
+    document.getElementById('result-b-rank').textContent = `${albumB.name}: #${albumBRank}`;
 
-    document.getElementById('result-loser-img').src = loser.image;
-    document.getElementById('result-loser-img').alt = loser.name;
-    document.getElementById('result-loser-name').textContent = loser.name;
-    document.getElementById('result-loser-rank').textContent = `Global Rank: #${loserRank}`;
-
-    // Show modal
-    document.getElementById('vote-result-modal').classList.add('show');
-}
-
-/**
- * Close vote result modal and show next matchup
- */
-function closeVoteResult() {
-    document.getElementById('vote-result-modal').classList.remove('show');
-    generateMatchup();
+    // Show result
+    document.getElementById('vote-result').classList.remove('hidden');
 }
 
 /**
@@ -338,9 +328,6 @@ function setupVoteButtons() {
             handleVote(choice);
         });
     });
-
-    // Setup modal close button
-    document.getElementById('close-result').addEventListener('click', closeVoteResult);
 }
 
 /**

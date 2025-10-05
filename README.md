@@ -1,5 +1,7 @@
 # Taylor Swift Album ELO Rankings
 
+**🔗 Live Site:** [https://daphnehansell.github.io/taylor-swift-elo/](https://daphnehansell.github.io/taylor-swift-elo/)
+
 A web app that uses the ELO rating system to rank Taylor Swift albums based on head-to-head matchups. Vote on album pairs, see how you compare to the crowd, and explore both personal rankings and the global consensus!
 
 ## For Users
