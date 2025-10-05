@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taylor Swift Album ELO Rankings</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Taylor Swift Album ELO Rankings</h1>
+            <nav>
+                <button id="vote-tab" class="tab-btn active">Vote</button>
+                <button id="my-rankings-tab" class="tab-btn">My Rankings</button>
+                <button id="global-rankings-tab" class="tab-btn">Global Rankings</button>
+            </nav>
+        </header>
+
+        <!-- Voting Section -->
+        <section id="vote-section" class="section active">
+            <div class="vote-counter">
+                <p>Your votes: <span id="vote-count">0</span></p>
+            </div>
+            <div class="matchup">
+                <h2>Which album is better?</h2>
+                <div class="albums">
+                    <div class="album-card" id="album-a">
+                        <img src="" alt="" id="album-a-img">
+                        <h3 id="album-a-name"></h3>
+                        <button class="vote-btn" data-choice="a">Choose</button>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="album-card" id="album-b">
+                        <img src="" alt="" id="album-b-img">
+                        <h3 id="album-b-name"></h3>
+                        <button class="vote-btn" data-choice="b">Choose</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- My Rankings Section -->
+        <section id="my-rankings-section" class="section">
+            <h2>Your Personal Rankings</h2>
+            <div class="share-link">
+                <p>Share your rankings:</p>
+                <input type="text" id="share-url" readonly>
+                <button id="copy-link">Copy Link</button>
+            </div>
+            <div id="personal-rankings" class="rankings-list"></div>
+        </section>
+
+        <!-- Global Rankings Section -->
+        <section id="global-rankings-section" class="section">
+            <h2>Global Consensus Rankings</h2>
+            <div class="stats">
+                <p>Total votes across all users: <span id="total-votes">0</span></p>
+            </div>
+            <div id="global-rankings" class="rankings-list"></div>
+        </section>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

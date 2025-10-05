@@ -1,0 +1,13 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Firebase (keep firebase-config.js in repo but with placeholder values)
+# Users will need to add their own config
+
+# Local development
+*.log
