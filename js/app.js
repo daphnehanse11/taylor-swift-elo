@@ -499,6 +499,64 @@ function setupCopyLink() {
 }
 
 /**
+ * Setup reset rankings button
+ */
+function setupResetButton() {
+    document.getElementById('reset-rankings').addEventListener('click', () => {
+        const confirmed = confirm(
+            '⚠️ Reset Your Rankings?\n\n' +
+            'This will:\n' +
+            '• Clear your personal rankings\n' +
+            '• Reset your vote count to 0\n' +
+            '• Start you fresh\n\n' +
+            'Your previous votes will remain in the global rankings.\n\n' +
+            'Are you sure you want to continue?'
+        );
+
+        if (confirmed) {
+            resetUserRankings();
+        }
+    });
+}
+
+/**
+ * Reset user rankings
+ */
+function resetUserRankings() {
+    // Reset personal ratings to initial ELO
+    albums.forEach(album => {
+        myOwnRatings[album.id] = INITIAL_ELO;
+    });
+
+    // If viewing own rankings, update displayed ratings
+    if (viewingUserId === userId) {
+        personalRatings = { ...myOwnRatings };
+    }
+
+    // Reset vote count
+    voteCount = 0;
+    document.getElementById('vote-count').textContent = voteCount;
+
+    // Clear localStorage
+    localStorage.setItem('tselo-ratings-' + userId, JSON.stringify(myOwnRatings));
+    localStorage.setItem('tselo-voteCount-' + userId, '0');
+
+    // Clear used pairs
+    usedPairs.clear();
+
+    // Update Firebase if connected
+    if (isInitialized()) {
+        updateUserStats(userId, myOwnRatings);
+    }
+
+    // Refresh display
+    displayPersonalRankings();
+
+    // Show success message
+    alert('✅ Rankings reset successfully! Start voting to build your new rankings.');
+}
+
+/**
  * Initialize app
  */
 async function init() {
@@ -516,6 +574,7 @@ async function init() {
     setupTabs(isSharedLink);
     setupVoteButtons();
     setupCopyLink();
+    setupResetButton();
 
     // Generate first matchup
     generateMatchup();

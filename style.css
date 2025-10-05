@@ -10,6 +10,40 @@ body {
     background-attachment: fixed;
     min-height: 100vh;
     padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '✨';
+    position: fixed;
+    font-size: 20px;
+    animation: sparkle1 3s infinite;
+    top: 10%;
+    left: 10%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+body::after {
+    content: '💜';
+    position: fixed;
+    font-size: 18px;
+    animation: sparkle2 4s infinite 1s;
+    top: 20%;
+    right: 15%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes sparkle1 {
+    0%, 100% { opacity: 0; transform: translateY(0) rotate(0deg); }
+    50% { opacity: 0.8; transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes sparkle2 {
+    0%, 100% { opacity: 0; transform: scale(1) rotate(0deg); }
+    50% { opacity: 0.7; transform: scale(1.3) rotate(360deg); }
 }
 
 .container {
@@ -54,13 +88,36 @@ header::before {
     pointer-events: none;
 }
 
+header::after {
+    content: '✨ ⭐ 💫 ✨ ⭐ 💫';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    opacity: 0.6;
+    letter-spacing: 30px;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
 h1 {
     font-size: 2.5em;
     margin-bottom: 25px;
     font-weight: 700;
     letter-spacing: -0.5px;
     position: relative;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2), 0 0 40px rgba(255, 255, 255, 0.3);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.2); }
+    to { text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2), 0 0 40px rgba(255, 255, 255, 0.5); }
 }
 
 nav {
@@ -123,6 +180,20 @@ nav {
     color: #333;
     margin-bottom: 40px;
     font-size: 2em;
+    position: relative;
+}
+
+.matchup h2::after {
+    content: '💜';
+    margin-left: 10px;
+    display: inline-block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.2); }
+    50% { transform: scale(1); }
 }
 
 .albums {
@@ -141,11 +212,33 @@ nav {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.album-card::before {
+    content: '✨';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.album-card:hover::before {
+    opacity: 0.8;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .album-card:hover {
     transform: translateY(-12px) scale(1.02);
-    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3), 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 8px 16px rgba(0, 0, 0, 0.1), 0 0 30px rgba(118, 75, 162, 0.3);
 }
 
 .album-card img {
@@ -212,7 +305,18 @@ nav {
 .vs {
     font-size: 3em;
     font-weight: bold;
-    color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ea67b7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbow 3s ease-in-out infinite;
+    background-size: 200% 200%;
+}
+
+@keyframes rainbow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .rankings-list {
@@ -285,8 +389,9 @@ nav {
 
 .ranking-item-compact:hover {
     transform: translateX(4px);
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
-    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3), 0 0 20px rgba(118, 75, 162, 0.2);
+    border-color: rgba(102, 126, 234, 0.5);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f3ff 100%);
 }
 
 .rank-compact {
@@ -359,13 +464,36 @@ nav {
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 #copy-link:hover {
     background: #764ba2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(118, 75, 162, 0.4);
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, #ea6767 0%, #a24b76 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+    margin-left: 10px;
+    box-shadow: 0 2px 8px rgba(234, 103, 103, 0.3);
+}
+
+.reset-btn:hover {
+    background: linear-gradient(135deg, #c75555 0%, #8a3f62 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(234, 103, 103, 0.4);
 }
 
 /* Global Rank Display */
@@ -453,49 +581,56 @@ nav {
 @media (max-width: 768px) {
     .albums {
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
         align-items: center;
     }
 
     .vs {
-        font-size: 1.3em;
+        font-size: 1.1em;
+        margin: 4px 0;
     }
 
     .album-card {
         width: 85%;
-        max-width: 240px;
-        padding: 12px;
+        max-width: 200px;
+        padding: 10px;
     }
 
     .album-card img {
         width: 100%;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
     .album-card h3 {
-        font-size: 0.95em;
-        margin-bottom: 8px;
+        font-size: 0.85em;
+        margin-bottom: 6px;
     }
 
     h1 {
-        font-size: 1.5em;
-    }
-
-    header {
-        padding: 30px 20px;
-    }
-
-    .matchup h2 {
         font-size: 1.3em;
         margin-bottom: 15px;
     }
 
+    header {
+        padding: 20px 15px;
+    }
+
+    .tab-btn {
+        padding: 8px 18px;
+        font-size: 0.9em;
+    }
+
+    .matchup h2 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+
     .vote-counter {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
 
     .vote-counter p {
-        font-size: 0.95em;
+        font-size: 0.85em;
     }
 
     #share-url {
@@ -509,21 +644,21 @@ nav {
     }
 
     .global-rank {
-        font-size: 0.8em;
-        padding: 6px;
-        margin: 6px 0;
+        font-size: 0.75em;
+        padding: 5px;
+        margin: 5px 0;
     }
 
     .vote-btn {
-        padding: 10px 20px;
-        font-size: 0.95em;
+        padding: 8px 16px;
+        font-size: 0.85em;
+    }
+
+    .section {
+        padding: 15px 10px;
     }
 
     /* Rankings layout on mobile */
-    .section {
-        padding: 20px 10px;
-    }
-
     .rankings-columns {
         gap: 6px;
     }
