@@ -227,6 +227,111 @@ nav {
     background: #764ba2;
 }
 
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    animation: fadeIn 0.3s;
+}
+
+.modal.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    animation: slideUp 0.3s;
+}
+
+.modal-content h3 {
+    color: #667eea;
+    font-size: 1.8em;
+    margin-bottom: 30px;
+}
+
+.result-comparison {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.result-album {
+    text-align: center;
+}
+
+.result-album img {
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.result-album p {
+    margin: 5px 0;
+    color: #333;
+    font-weight: 500;
+}
+
+.result-rank {
+    color: #667eea;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.vs-small {
+    font-size: 1.5em;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.modal-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.modal-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
 @media (max-width: 768px) {
     .albums {
         flex-direction: column;
@@ -249,5 +354,18 @@ nav {
     #share-url {
         width: 100%;
         margin-bottom: 10px;
+    }
+
+    .modal-content {
+        padding: 30px 20px;
+    }
+
+    .result-comparison {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .vs-small {
+        transform: rotate(90deg);
     }
 }

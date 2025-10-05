@@ -16,6 +16,7 @@ let currentMatchup = null;
 let personalRatings = {};
 let globalRatings = {};
 let voteCount = 0;
+let totalGlobalVotes = 0;
 let usedPairs = new Set();
 
 /**
@@ -32,7 +33,7 @@ function initUserId() {
         userId = localStorage.getItem('tselo-userId');
         if (!userId) {
             // Generate new ID
-            userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
             localStorage.setItem('tselo-userId', userId);
         }
     }
@@ -83,6 +84,7 @@ async function loadGlobalRankings() {
         if (data) {
             const { totalVotes, lastUpdated, ...ratings } = data;
             globalRatings = ratings;
+            totalGlobalVotes = totalVotes || 0;
 
             // Initialize missing albums
             albums.forEach(album => {
@@ -91,9 +93,7 @@ async function loadGlobalRankings() {
                 }
             });
 
-            if (totalVotes) {
-                document.getElementById('total-votes').textContent = totalVotes;
-            }
+            updateTotalVotesDisplay();
         }
     } else {
         // Load from localStorage
@@ -101,6 +101,11 @@ async function loadGlobalRankings() {
         if (saved) {
             globalRatings = JSON.parse(saved);
         }
+        const savedVotes = localStorage.getItem('tselo-total-votes');
+        if (savedVotes) {
+            totalGlobalVotes = parseInt(savedVotes);
+        }
+        updateTotalVotesDisplay();
     }
 
     // Initialize all albums with default rating if needed
@@ -109,6 +114,13 @@ async function loadGlobalRankings() {
             globalRatings[album.id] = INITIAL_ELO;
         }
     });
+}
+
+/**
+ * Update total votes display
+ */
+function updateTotalVotesDisplay() {
+    document.getElementById('total-votes').textContent = totalGlobalVotes;
 }
 
 /**
@@ -176,10 +188,12 @@ async function handleVote(choice) {
     // Update global ratings
     globalRatings = updateRatings(globalRatings, winner.id, loser.id);
 
-    // Increment vote count
+    // Increment vote counts
     voteCount++;
+    totalGlobalVotes++;
     document.getElementById('vote-count').textContent = voteCount;
     localStorage.setItem('tselo-voteCount-' + userId, voteCount);
+    updateTotalVotesDisplay();
 
     // Save to Firebase or localStorage
     if (isInitialized()) {
@@ -190,9 +204,59 @@ async function handleVote(choice) {
         // Save to localStorage
         localStorage.setItem('tselo-ratings-' + userId, JSON.stringify(personalRatings));
         localStorage.setItem('tselo-global-ratings', JSON.stringify(globalRatings));
+        localStorage.setItem('tselo-total-votes', totalGlobalVotes.toString());
     }
 
-    // Generate next matchup
+    // Show vote result modal
+    showVoteResult(winner, loser);
+}
+
+/**
+ * Show vote result modal with global rankings
+ */
+function showVoteResult(winner, loser) {
+    const rankings = getRankings(globalRatings, albums);
+    const winnerRank = rankings.findIndex(a => a.id === winner.id) + 1;
+    const loserRank = rankings.findIndex(a => a.id === loser.id) + 1;
+
+    // Determine if user agrees with majority
+    const agreesWithMajority = winnerRank < loserRank;
+
+    const messages = agreesWithMajority ? [
+        "You're with the crowd! 👥",
+        "Most people agree! ✨",
+        "Popular opinion! 🌟",
+        "You picked the favorite! 💜"
+    ] : [
+        "Hot take! 🔥",
+        "Going against the grain! 💫",
+        "Minority opinion! ✊",
+        "Bold choice! 🎯"
+    ];
+
+    const message = messages[Math.floor(Math.random() * messages.length)];
+
+    // Update modal content
+    document.getElementById('result-message').textContent = message;
+    document.getElementById('result-winner-img').src = winner.image;
+    document.getElementById('result-winner-img').alt = winner.name;
+    document.getElementById('result-winner-name').textContent = winner.name;
+    document.getElementById('result-winner-rank').textContent = `Global Rank: #${winnerRank}`;
+
+    document.getElementById('result-loser-img').src = loser.image;
+    document.getElementById('result-loser-img').alt = loser.name;
+    document.getElementById('result-loser-name').textContent = loser.name;
+    document.getElementById('result-loser-rank').textContent = `Global Rank: #${loserRank}`;
+
+    // Show modal
+    document.getElementById('vote-result-modal').classList.add('show');
+}
+
+/**
+ * Close vote result modal and show next matchup
+ */
+function closeVoteResult() {
+    document.getElementById('vote-result-modal').classList.remove('show');
     generateMatchup();
 }
 
@@ -249,24 +313,36 @@ function setupTabs() {
         'global-rankings-tab': 'global-rankings-section'
     };
 
+    // Restore last active tab
+    const lastActiveTab = localStorage.getItem('tselo-active-tab') || 'vote-tab';
+    switchToTab(lastActiveTab, tabs);
+
     Object.keys(tabs).forEach(tabId => {
         document.getElementById(tabId).addEventListener('click', () => {
-            // Update active tab
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-
-            // Show corresponding section
-            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
-            document.getElementById(tabs[tabId]).classList.add('active');
-
-            // Refresh rankings if viewing them
-            if (tabId === 'my-rankings-tab') {
-                displayPersonalRankings();
-            } else if (tabId === 'global-rankings-tab') {
-                displayGlobalRankings();
-            }
+            switchToTab(tabId, tabs);
+            localStorage.setItem('tselo-active-tab', tabId);
         });
     });
+}
+
+/**
+ * Switch to a specific tab
+ */
+function switchToTab(tabId, tabs) {
+    // Update active tab
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+
+    // Show corresponding section
+    document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+    document.getElementById(tabs[tabId]).classList.add('active');
+
+    // Refresh rankings if viewing them
+    if (tabId === 'my-rankings-tab') {
+        displayPersonalRankings();
+    } else if (tabId === 'global-rankings-tab') {
+        displayGlobalRankings();
+    }
 }
 
 /**
@@ -279,6 +355,9 @@ function setupVoteButtons() {
             handleVote(choice);
         });
     });
+
+    // Setup modal close button
+    document.getElementById('close-result').addEventListener('click', closeVoteResult);
 }
 
 /**
@@ -287,8 +366,8 @@ function setupVoteButtons() {
 function setupCopyLink() {
     document.getElementById('copy-link').addEventListener('click', () => {
         const input = document.getElementById('share-url');
-        input.select();
-        navigator.clipboard.writeText(input.value);
+        const shareText = `💜 Check out my Taylor Swift album rankings! ${input.value}`;
+        navigator.clipboard.writeText(shareText);
 
         const btn = document.getElementById('copy-link');
         const originalText = btn.textContent;

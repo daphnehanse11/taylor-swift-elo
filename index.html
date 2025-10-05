@@ -11,14 +11,14 @@
         <header>
             <h1>Taylor Swift Album ELO Rankings</h1>
             <nav>
-                <button id="vote-tab" class="tab-btn active">Vote</button>
+                <button id="vote-tab" class="tab-btn">Vote</button>
                 <button id="my-rankings-tab" class="tab-btn">My Rankings</button>
                 <button id="global-rankings-tab" class="tab-btn">Global Rankings</button>
             </nav>
         </header>
 
         <!-- Voting Section -->
-        <section id="vote-section" class="section active">
+        <section id="vote-section" class="section">
             <div class="vote-counter">
                 <p>Your votes: <span id="vote-count">0</span></p>
             </div>
@@ -59,6 +59,27 @@
             </div>
             <div id="global-rankings" class="rankings-list"></div>
         </section>
+    </div>
+
+    <!-- Vote Result Modal -->
+    <div id="vote-result-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="result-message"></h3>
+            <div class="result-comparison">
+                <div class="result-album">
+                    <img id="result-winner-img" src="" alt="">
+                    <p id="result-winner-name"></p>
+                    <p class="result-rank" id="result-winner-rank"></p>
+                </div>
+                <div class="vs-small">vs</div>
+                <div class="result-album">
+                    <img id="result-loser-img" src="" alt="">
+                    <p id="result-loser-name"></p>
+                    <p class="result-rank" id="result-loser-rank"></p>
+                </div>
+            </div>
+            <button id="close-result" class="modal-btn">Next Matchup →</button>
+        </div>
     </div>
 
     <script type="module" src="js/app.js"></script>
