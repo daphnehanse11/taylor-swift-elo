@@ -2,15 +2,11 @@
 
 A web app that uses the ELO rating system to rank Taylor Swift albums based on head-to-head matchups. Vote on album pairs and see both your personal rankings and the global consensus!
 
-## Features
+## For Users
 
-- **ELO Rating System**: Albums compete in matchups using the same algorithm as chess rankings
-- **Personal Rankings**: Build your own rankings through voting, shareable via URL
-- **Global Consensus**: See aggregate rankings from all users
-- **No Login Required**: Uses anonymous user IDs stored in localStorage
-- **Mobile Friendly**: Responsive design works on all devices
+Just visit the site and start voting - no setup or login required! Share your ranking URL with friends.
 
-## Setup
+## For Developers - Deployment Setup
 
 ### 1. Firebase Configuration (Required for multi-user rankings)
 
