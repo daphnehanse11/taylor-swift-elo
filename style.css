@@ -775,3 +775,24 @@ nav {
         font-size: 0.55em;
     }
 }
+
+/* Support Footer */
+.support-footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9em;
+}
+
+.support-footer a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.support-footer a:hover {
+    color: white;
+    border-bottom-color: white;
+}
