@@ -104,25 +104,38 @@ export async function updateGlobalELO(winnerId, loserId, newWinnerRating, newLos
     try {
         const { doc, setDoc, getDoc, increment } = window.firestoreFunctions;
 
+        // Check if this is a new user
+        const userDocRef = doc(db, 'uniqueUsers', userId);
+        const userDoc = await getDoc(userDocRef);
+        const isNewUser = !userDoc.exists();
+
         // Update global ratings
         const globalDocRef = doc(db, 'globalELO', 'ratings');
         const globalDoc = await getDoc(globalDocRef);
 
         const currentRatings = globalDoc.exists() ? globalDoc.data() : {};
 
-        await setDoc(globalDocRef, {
+        const updates = {
             ...currentRatings,
             [winnerId]: newWinnerRating,
             [loserId]: newLoserRating,
             totalVotes: increment(1),
             lastUpdated: Date.now()
-        }, { merge: true });
+        };
 
-        // Track unique user in separate document to avoid race conditions
-        const userDocRef = doc(db, 'uniqueUsers', userId);
-        await setDoc(userDocRef, {
-            firstVote: Date.now()
-        }, { merge: true });
+        // Increment user count if this is a new user
+        if (isNewUser) {
+            updates.uniqueUsersCount = increment(1);
+        }
+
+        await setDoc(globalDocRef, updates, { merge: true });
+
+        // Track unique user in separate document
+        if (isNewUser) {
+            await setDoc(userDocRef, {
+                firstVote: Date.now()
+            });
+        }
     } catch (error) {
         console.error('Error updating global ELO:', error);
     }
@@ -156,10 +169,32 @@ export async function getUniqueUserCount() {
     if (!initialized) return 0;
 
     try {
-        const { collection, getDocs } = window.firestoreFunctions;
-        const usersRef = collection(db, 'uniqueUsers');
-        const querySnapshot = await getDocs(usersRef);
-        return querySnapshot.size;
+        const { doc, getDoc, collection, getDocs, setDoc } = window.firestoreFunctions;
+        const globalDocRef = doc(db, 'globalELO', 'ratings');
+        const globalDoc = await getDoc(globalDocRef);
+
+        if (globalDoc.exists()) {
+            const data = globalDoc.data();
+
+            // If uniqueUsersCount exists, return it
+            if (typeof data.uniqueUsersCount === 'number') {
+                return data.uniqueUsersCount;
+            }
+
+            // Otherwise, migrate by counting existing users and updating the field
+            console.log('Migrating user count...');
+            const usersRef = collection(db, 'uniqueUsers');
+            const querySnapshot = await getDocs(usersRef);
+            const count = querySnapshot.size;
+
+            // Update the global document with the count
+            await setDoc(globalDocRef, {
+                uniqueUsersCount: count
+            }, { merge: true });
+
+            return count;
+        }
+        return 0;
     } catch (error) {
         console.error('Error getting unique user count:', error);
         return 0;
