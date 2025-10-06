@@ -109,18 +109,19 @@ export async function updateGlobalELO(winnerId, loserId, newWinnerRating, newLos
         const globalDoc = await getDoc(globalDocRef);
 
         const currentRatings = globalDoc.exists() ? globalDoc.data() : {};
-        const uniqueUsers = currentRatings.uniqueUsers || {};
-
-        // Add user to unique users set
-        uniqueUsers[userId] = true;
 
         await setDoc(globalDocRef, {
             ...currentRatings,
             [winnerId]: newWinnerRating,
             [loserId]: newLoserRating,
             totalVotes: increment(1),
-            uniqueUsers: uniqueUsers,
             lastUpdated: Date.now()
+        }, { merge: true });
+
+        // Track unique user in separate document to avoid race conditions
+        const userDocRef = doc(db, 'uniqueUsers', userId);
+        await setDoc(userDocRef, {
+            firstVote: Date.now()
         }, { merge: true });
     } catch (error) {
         console.error('Error updating global ELO:', error);
@@ -145,6 +146,23 @@ export async function getGlobalELO() {
     } catch (error) {
         console.error('Error getting global ELO:', error);
         return null;
+    }
+}
+
+/**
+ * Get count of unique users
+ */
+export async function getUniqueUserCount() {
+    if (!initialized) return 0;
+
+    try {
+        const { collection, getDocs } = window.firestoreFunctions;
+        const usersRef = collection(db, 'uniqueUsers');
+        const querySnapshot = await getDocs(usersRef);
+        return querySnapshot.size;
+    } catch (error) {
+        console.error('Error getting unique user count:', error);
+        return 0;
     }
 }
 

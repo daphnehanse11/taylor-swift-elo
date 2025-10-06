@@ -7,6 +7,7 @@ import {
     getUserStats,
     updateGlobalELO,
     getGlobalELO,
+    getUniqueUserCount,
     isInitialized
 } from './firebase-service.js';
 
@@ -108,10 +109,12 @@ async function loadGlobalRankings() {
     if (isInitialized()) {
         const data = await getGlobalELO();
         if (data) {
-            const { totalVotes, uniqueUsers, lastUpdated, ...ratings } = data;
+            const { totalVotes, lastUpdated, ...ratings } = data;
             globalRatings = ratings;
             totalGlobalVotes = totalVotes || 0;
-            totalUniqueUsers = uniqueUsers ? Object.keys(uniqueUsers).length : 0;
+
+            // Get accurate user count from separate collection
+            totalUniqueUsers = await getUniqueUserCount();
 
             // Initialize missing albums
             albums.forEach(album => {
